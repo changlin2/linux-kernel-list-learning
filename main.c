@@ -1,6 +1,7 @@
 #include "my_list.h"
 
 
+
 struct mynode{
     struct list_head list;
     int id;
@@ -29,7 +30,13 @@ int main() {
     list_add(&mynode1.list, &my_head);
     list_add(&mynode2.list, &my_head);
     for(pos = my_head.next; pos != &my_head; pos = pos->next){
-        printf();
+        struct mynode *node_ptr = list_entry(pos, struct mynode, list);
+        printf("id = %d\n", node_ptr->id);
+    }
+
+    struct mynode *node_ptr;
+    list_for_each_entry(node_ptr, &my_head, list){
+        printf("id = %d\n", node_ptr->id);
     }
     return 0;
 }

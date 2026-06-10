@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stddef.h>
 
 struct list_head{
     struct list_head *next, *prev;
@@ -55,3 +56,38 @@ static inline void __list_del_entry(struct list_head *entry)
 {
     __list_del(entry->prev, entry->next);
 }
+
+static inline void list_del(struct list_head *entry)
+{
+    __list_del_entry(entry);
+	// entry->next = LIST_POISON1;
+	// entry->prev = LIST_POISON2;//poison
+}
+
+static inline int list_empty(const struct list_head *head)
+{
+	return head->next == head;
+}
+
+static inline int list_is_head(const struct list_head *list, const struct list_head *head)
+{
+    return list == head;
+}
+
+#define list_entry(ptr, type, member) ({ \
+    void *__mptr = (void *)(ptr);   \
+    ((type *)(__mptr - offsetof(type, member))); })
+
+#define list_first_entry(ptr, type, member) \
+    list_entry((ptr)->next, type, member)
+
+#define list_entry_is_head(pos, head, member) \
+    list_is_head(&pos->member, head)
+
+#define list_next_entry(pos, member) \
+    list_entry((pos)->member.next, typeof(*(pos)), member)
+
+#define list_for_each_entry(pos, head, member)              \
+    for(pos = list_first_entry(head, typeof(*pos), member); \
+        !list_entry_is_head(pos, head, member);             \
+        pos = list_next_entry(pos, member))
