@@ -38,5 +38,21 @@ int main() {
     list_for_each_entry(node_ptr, &my_head, list){
         printf("id = %d\n", node_ptr->id);
     }
+
+    struct mynode *n;
+    struct mynode mynode3 = {.id = 3, .list = LIST_HEAD_INIT(mynode3.list)};
+    struct mynode mynode4 = {.id = 4, .list = LIST_HEAD_INIT(mynode4.list)};
+
+    list_add(&mynode3.list, &my_head);
+    list_add(&mynode4.list, &my_head);
+
+    list_for_each_entry_safe(node_ptr, n, &my_head, list){
+        if(node_ptr->id == 3){
+            list_del(&node_ptr->list);
+            continue;
+        }
+        printf("id = %d\n", node_ptr->id);
+    }
+    
     return 0;
 }

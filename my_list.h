@@ -4,6 +4,9 @@
 struct list_head{
     struct list_head *next, *prev;
 };
+#define POISON_POINTER_DELTA 0
+#define LIST_POISON1  ((void *) 0x100 + POISON_POINTER_DELTA)
+#define LIST_POISON2  ((void *) 0x122 + POISON_POINTER_DELTA)
 
 #define LIST_HEAD_INIT(name) { &(name), &(name) }
 #define LIST_HEAD(name) \
@@ -60,8 +63,8 @@ static inline void __list_del_entry(struct list_head *entry)
 static inline void list_del(struct list_head *entry)
 {
     __list_del_entry(entry);
-	// entry->next = LIST_POISON1;
-	// entry->prev = LIST_POISON2;//poison
+	entry->next = LIST_POISON1;
+	entry->prev = LIST_POISON2;//poison
 }
 
 static inline int list_empty(const struct list_head *head)
@@ -91,3 +94,10 @@ static inline int list_is_head(const struct list_head *list, const struct list_h
     for(pos = list_first_entry(head, typeof(*pos), member); \
         !list_entry_is_head(pos, head, member);             \
         pos = list_next_entry(pos, member))
+
+#define list_for_each_entry_safe(pos, n, head, member) \
+    for(pos = list_first_entry(head, typeof(*pos), member), \
+        n = list_next_entry(pos, member);\
+        !list_entry_is_head(pos, head, member); \
+        pos = n, \
+        n = list_next_entry(n, member))
